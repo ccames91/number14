@@ -1,15 +1,14 @@
 const express = require("express");
 const session = require('express-session');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const exphbs = require("express-handlebars"); 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const exphbs = require("express-handlebars");
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
 const db = require("./models");
-db.sequelize.sync();
 
 const sessionStore = new SequelizeStore({
   db: db.sequelize,
@@ -17,7 +16,7 @@ const sessionStore = new SequelizeStore({
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET, 
     resave: false,
     saveUninitialized: false,
     store: sessionStore,
@@ -30,6 +29,9 @@ sessionStore.sync();
 require("./routes/api-routes")(app);
 require("./routes/html-routes")(app);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+db.sequelize.sync().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
 });
+
