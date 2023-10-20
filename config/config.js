@@ -1,16 +1,22 @@
+const Sequelize = require('sequelize');
+require('dotenv').config();
 
+let sequelize;
 
-module.exports = {
-    database: {
-      username: process.env.DB_USERNAME || "your_database_username",
-      password: process.env.DB_PASSWORD || "your_database_password",
-      database: process.env.DB_NAME || "your_database_name",
-      host: process.env.DB_HOST || "localhost",
-      dialect: "mysql", 
-    },
-  
-    session: {
-      secret: process.env.SESSION_SECRET || "your_session_secret_here",
-    },
-  };
+if (process.env.JAWSDB_URL) {
+  sequelize = new Sequelize(process.env.JAWSDB_URL);
+} else {
+  sequelize = new Sequelize(
+    process.env.DB_NAME,
+    process.env.DB_USER,
+    process.env.DB_PASSWORD,
+    {
+      host: 'localhost',
+      dialect: 'mysql',
+      port: 3306
+    }
+  );
+}
+
+module.exports = sequelize;
   
