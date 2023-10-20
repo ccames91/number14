@@ -1,28 +1,43 @@
-const express = require("express");
-const session = require('express-session');
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
-const exphbs = require("express-handlebars"); 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const router = require('express').Router();
+const { SomeModel } = require('../../models'); 
+const withAuth = require('../../utils/auth');
 
-app.engine("handlebars", exphbs({ defaultLayout: "main" }));
-app.set("view engine", "handlebars");
+router.post('/', withAuth, async (req, res) => {
+  try {
+    const newItem = await SomeModel.create({
+      ...req.body,
+      user_id: req.session.user_id, 
+    });
 
-const db = require("./models");
-
-const sessionStore = new SequelizeStore({
-  db: db.sequelize,
+    res.status(200).json(newItem);
+  } catch (err) {
+    res.status(400).json(err);
+  }
 });
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET, 
-    resave: false,
-    saveUninitialized: false,
-    store: sessionStore,
-    cookie: { maxAge: 3600000 }, 
-  })
-);
+
+router.delete('/:id', withAuth, async (req, res) => {
+  try {
+   
+    const itemData = await SomeModel.destroy({
+      where: {
+        id: req.params.id, 
+        user_id: req.session.user_id,
+      },
+    });
+
+    if (!itemData) {
+      res.status(404).json({ message: 'No item found with this id!' });
+      return;
+    }
+
+    res.status(200).json(itemData);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+module.exports = router;
 
 sessionStore.sync();
 
