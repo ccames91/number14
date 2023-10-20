@@ -1,8 +1,8 @@
 {
     "development": {
       "username": "root",
-      "password": "your_password",
-      "database": "your_database_name",
+      "password": "atari1991",
+      "database": "Tech_Blog",
       "host": "127.0.0.1",
       "dialect": "mysql"
     }
